@@ -271,6 +271,6 @@ MIT License
 
 ## 👤 개발자
 
-**지원자**: [귀하의 이름]  
+**지원자**: [정유현] 
 **포지션**: 캐논 코리아 솔루션 개발 (복합기 소프트웨어)  
 **GitHub**: [@i-am-U-hyUn](https://github.com/i-am-U-hyUn)
