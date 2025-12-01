@@ -1,0 +1,142 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    container_name: canon-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - canon-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: canon-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - canon-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Spring Boot API Server
+  spring-api:
+    build:
+      context: ./backend/spring-api
+      dockerfile: Dockerfile
+    container_name: canon-spring-api
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - canon-network
+    volumes:
+      - ./logs/spring:/app/logs
+
+  # .NET Monitoring Agent
+  dotnet-agent:
+    build:
+      context: ./backend/dotnet-agent
+      dockerfile: Dockerfile
+    container_name: canon-dotnet-agent
+    environment:
+      DOTNET_ENVIRONMENT: ${DOTNET_ENVIRONMENT}
+      ConnectionStrings__PostgreSQL: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      ConnectionStrings__Redis: redis:6379
+      SnmpConfig__Community: ${SNMP_COMMUNITY}
+      SnmpConfig__Timeout: ${SNMP_TIMEOUT}
+      SnmpConfig__NetworkRange: ${PRINTER_NETWORK_RANGE}
+      Notification__SmtpHost: ${SMTP_HOST}
+      Notification__SmtpPort: ${SMTP_PORT}
+      Notification__SmtpUser: ${SMTP_USER}
+      Notification__SmtpPassword: ${SMTP_PASSWORD}
+      Notification__SlackWebhook: ${SLACK_WEBHOOK_URL}
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - canon-network
+    volumes:
+      - ./logs/dotnet:/app/logs
+    # SNMP 스캔을 위한 추가 권한
+    privileged: true
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: canon-frontend
+    environment:
+      REACT_APP_API_URL: http://localhost:8080/api/v1
+      REACT_APP_WS_URL: ws://localhost:8080/ws
+    ports:
+      - "3000:80"
+    depends_on:
+      - spring-api
+    networks:
+      - canon-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: canon-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - spring-api
+      - frontend
+    networks:
+      - canon-network
+
+networks:
+  canon-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:

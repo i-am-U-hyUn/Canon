@@ -1,0 +1,47 @@
+.print-jobs-page {
+  padding: 24px;
+}
+
+.print-jobs-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.print-jobs-page .page-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.print-jobs-page .ant-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.print-jobs-page .ant-statistic-title {
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+.print-jobs-page .ant-statistic-content {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.print-jobs-page .ant-table {
+  font-size: 13px;
+}
+
+.print-jobs-page .ant-table-thead > tr > th {
+  background: #fafafa;
+  font-weight: 600;
+  color: #262626;
+}
+
+.print-jobs-page .ant-tag {
+  font-size: 12px;
+  border-radius: 4px;
+}

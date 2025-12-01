@@ -1,0 +1,62 @@
+.reports-page {
+  padding: 24px;
+}
+
+.reports-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.reports-page .page-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.reports-page .ant-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.reports-page .ant-card h3 {
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.reports-page .ant-statistic-title {
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+.reports-page .ant-statistic-content {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.reports-page .ant-tabs-tab {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.reports-page .recharts-text {
+  font-size: 12px;
+}
+
+.reports-page .recharts-legend-item-text {
+  font-size: 13px;
+}
+
+.reports-page .ant-table {
+  font-size: 13px;
+}
+
+.reports-page .ant-table-thead > tr > th {
+  background: #fafafa;
+  font-weight: 600;
+  color: #262626;
+}
