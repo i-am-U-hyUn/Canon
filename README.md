@@ -1,6 +1,7 @@
 # Canon Print Management System
 
 캐논 복합기 통합 출력 관리 솔루션 - 엔터프라이즈급 비용 절감 및 자원 최적화 시스템
+
 https://github.com/user-attachments/assets/3de1be89-77f9-4bf8-b066-23ad218ff6ea
 
 ## 🎯 프로젝트 개요
